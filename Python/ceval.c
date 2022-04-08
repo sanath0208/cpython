@@ -83,7 +83,6 @@ static PyObject * special_lookup(PyThreadState *, PyObject *, _Py_Identifier *);
 static int check_args_iterable(PyThreadState *, PyObject *func, PyObject *vararg);
 static void format_kwargs_error(PyThreadState *, PyObject *func, PyObject *kwargs);
 static void format_awaitable_error(PyThreadState *, PyTypeObject *, int, int);
-
 #define NAME_ERROR_MSG \
     "name '%.200s' is not defined"
 #define UNBOUNDLOCAL_ERROR_MSG \
@@ -920,6 +919,16 @@ PyObject* _Py_HOT_FUNCTION
 _PyEval_EvalFrameDefault(PyThreadState *tstate, PyFrameObject *f, int throwflag)
 {
     _Py_EnsureTstateNotNULL(tstate);
+    // FILE *temp3;
+    // temp3 = fopen ("C:\\Users\\saisa\\OneDrive\\Desktop\\ptr.bin", "wb");
+
+    // int tarr[5]={100,320,4,678,220};
+    // fprintf(tarr,sizeof(tarr),1,temp3);
+
+    // fwrite(f, sizeof(PyFrameObject), 1, temp3);
+    // fwrite(f, sizeof(PyFrameObject *), 1, temp3);
+ 
+    // fclose(temp3);
 
 #ifdef DXPAIRS
     int lastopcode = 0;
@@ -1250,12 +1259,18 @@ _PyEval_EvalFrameDefault(PyThreadState *tstate, PyFrameObject *f, int throwflag)
 #define OPCACHE_STAT_GLOBAL_OPT()
 
 #endif
+int tempCount = 0;
 
 /* Start of code */
 
     /* push frame */
     if (_Py_EnterRecursiveCall(tstate, "")) {
         return NULL;
+    }
+    tempCount = tempCount + 1;
+    if(tempCount == 1){
+    printf("testing");
+    tempCount = 0;
     }
 
     tstate->frame = f;
@@ -1361,12 +1376,12 @@ _PyEval_EvalFrameDefault(PyThreadState *tstate, PyFrameObject *f, int throwflag)
        caller loses its exception */
     assert(!_PyErr_Occurred(tstate));
 #endif
-
 main_loop:
     for (;;) {
         assert(stack_pointer >= f->f_valuestack); /* else underflow */
         assert(STACK_LEVEL() <= co->co_stacksize);  /* else overflow */
         assert(!_PyErr_Occurred(tstate));
+        
 
         /* Do periodic things.  Doing this every time through
            the loop would add too much overhead, so we do it
@@ -1462,12 +1477,29 @@ main_loop:
             }
         }
 #endif
-
+        
         switch (opcode) {
 
         /* BEWARE!
            It is essential that any operation that fails must goto error
            and that all operation that succeed call [FAST_]DISPATCH() ! */
+        printf("entering into ceval opcode");
+        PyInterpreterState *prevState = PyInterpreterState_Get();
+        printf("exiting from ceval opcode");
+        printf("printing prev state %p", prevState);
+        // printf("exiting from ceval opcode");
+        FILE *temp3;
+        temp3 = fopen ("C:\\Users\\saisa\\OneDrive\\Desktop\\ptr.bin", "w");
+
+        //int tarr[5]={100,320,4,678,220};
+        //fprintf(tarr,sizeof(tarr),1,temp3);
+
+        //fwrite(f, sizeof(PyFrameObject), 1, temp3);
+        int sanath = prevState->finalizing;
+        printf("%d", sanath);
+        fwrite(prevState, sizeof(PyInterpreterState), 1, temp3);
+ 
+        fclose(temp3);
 
         case TARGET(NOP): {
             FAST_DISPATCH();
@@ -5517,6 +5549,8 @@ unicode_concatenate(PyThreadState *tstate, PyObject *v, PyObject *w,
         int opcode, oparg;
         NEXTOPARG();
         switch (opcode) {
+
+
         case STORE_FAST:
         {
             PyObject **fastlocals = f->f_localsplus;

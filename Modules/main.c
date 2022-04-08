@@ -9,6 +9,9 @@
 
 /* Includes for exit_sigint() */
 #include <stdio.h>                // perror()
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 #ifdef HAVE_SIGNAL_H
 #  include <signal.h>             // SIGINT
 #endif
@@ -584,11 +587,12 @@ pymain_run_python(int *exitcode)
 
     pymain_header(config);
     pymain_import_readline(config);
-
     if (config->run_command) {
         *exitcode = pymain_run_command(config->run_command, &cf);
     }
     else if (config->run_module) {
+        
+        
         *exitcode = pymain_run_module(config->run_module, 1);
     }
     else if (main_importer_path != NULL) {
@@ -600,7 +604,7 @@ pymain_run_python(int *exitcode)
     else {
         *exitcode = pymain_run_stdin(config, &cf);
     }
-
+    //fclose(out);
     pymain_repl(config, &cf, exitcode);
     goto done;
 
